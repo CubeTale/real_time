@@ -25,4 +25,8 @@ const sendEvent = (handlerId, payload) => {
   });
 };
 
-export { sendEvent };
+socket.on('stagechange', (data) => {
+  console.log('stagechange: ', data);
+});
+
+export { sendEvent, socket };
