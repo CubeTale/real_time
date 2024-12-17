@@ -29,4 +29,4 @@ socket.on('stagechange', (data) => {
   console.log('stagechange: ', data);
 });
 
-export { sendEvent, socket };
+export { sendEvent };
