@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { addUser } from '../models/user.model.js';
-import { handleConnection, handleDisconnect, handlerEvent } from './helper.js';
+import { handleConnection, handleDisconnect, handleEvent } from './helper.js';
 import { getGameAssets } from '../init/assets.js';
 
 const registerHandler = (io) => {
@@ -12,14 +12,10 @@ const registerHandler = (io) => {
 
     handleConnection(socket, userUUID);
 
-    const assets = () => {
-      socket.emit('assets', getGameAssets());
-    };
-
-    socket.emit('stagechange', getGameAssets());
-
+    const gameAssets = getGameAssets();
+    socket.emit('gameAssets', gameAssets);
     // 모든 서비스 이벤트 처리
-    socket.on('event', (data) => handlerEvent(io, socket, data));
+    socket.on('event', (data) => handleEvent(io, socket, data));
     // 접속 해제시 이벤트 처리
     socket.on('disconnect', () => handleDisconnect(socket, userUUID));
   });

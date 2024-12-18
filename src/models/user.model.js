@@ -1,3 +1,4 @@
+// model/user.model.js
 const users = [];
 
 export const addUser = (user) => {
@@ -11,6 +12,6 @@ export const removeUser = (socketId) => {
   }
 };
 
-export const getUser = () => {
+export const getUsers = () => {
   return users;
 };

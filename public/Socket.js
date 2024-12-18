@@ -6,6 +6,11 @@ const socket = io('http://localhost:3000', {
   },
 });
 
+let gameAssetsData = null;
+socket.on('gameAssets', (data) => {
+  gameAssetsData = data;
+});
+
 let userId = null;
 socket.on('response', (data) => {
   console.log(data);
@@ -25,8 +30,4 @@ const sendEvent = (handlerId, payload) => {
   });
 };
 
-socket.on('stagechange', (data) => {
-  console.log('stagechange: ', data);
-});
-
-export { sendEvent };
+export { sendEvent, gameAssetsData };

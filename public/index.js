@@ -3,6 +3,7 @@ import Ground from './Ground.js';
 import CactiController from './CactiController.js';
 import Score from './Score.js';
 import ItemController from './ItemController.js';
+import './Socket.js';
 import { sendEvent } from './Socket.js';
 
 const canvas = document.getElementById('game');
@@ -29,55 +30,20 @@ const GROUND_SPEED = 0.5;
 
 // 선인장
 const CACTI_CONFIG = [
-  { width: 48 / 1.5, height: 100 / 1.5, image: 'images/weapon1.png' },
-  { width: 98 / 1.5, height: 100 / 1.5, image: 'images/weapon2.png' },
-  { width: 68 / 1.5, height: 70 / 1.5, image: 'images/weapon3.png' },
+  { width: 48 / 1.5, height: 100 / 1.5, image: 'images/cactus_1.png' },
+  { width: 98 / 1.5, height: 100 / 1.5, image: 'images/cactus_2.png' },
+  { width: 68 / 1.5, height: 70 / 1.5, image: 'images/cactus_3.png' },
 ];
 
 // 아이템
 const ITEM_CONFIG = [
-  {
-    width: 50 / 1.5,
-    height: 50 / 1.5,
-    id: 1,
-    image: 'images/items/item1.PNG',
-  },
-  {
-    width: 50 / 1.5,
-    height: 50 / 1.5,
-    id: 2,
-    image: 'images/items/item2.PNG',
-  },
-  {
-    width: 50 / 1.5,
-    height: 50 / 1.5,
-    id: 3,
-    image: 'images/items/item3.PNG',
-  },
-  {
-    width: 50 / 1.5,
-    height: 50 / 1.5,
-    id: 4,
-    image: 'images/items/item4.PNG',
-  },
-  {
-    width: 50 / 1.5,
-    height: 50 / 1.5,
-    id: 5,
-    image: 'images/items/item5.PNG',
-  },
-  {
-    width: 50 / 1.5,
-    height: 50 / 1.5,
-    id: 6,
-    image: 'images/items/item6.PNG',
-  },
-  {
-    width: 50 / 1.5,
-    height: 50 / 1.5,
-    id: 7,
-    image: 'images/items/item7.PNG',
-  },
+  { width: 50 / 1.5, height: 50 / 1.5, id: 1, image: 'images/items/item1.png' },
+  { width: 50 / 1.5, height: 50 / 1.5, id: 2, image: 'images/items/item2.png' },
+  { width: 50 / 1.5, height: 50 / 1.5, id: 3, image: 'images/items/item3.png' },
+  { width: 50 / 1.5, height: 50 / 1.5, id: 4, image: 'images/items/item4.png' },
+  { width: 50 / 1.5, height: 50 / 1.5, id: 5, image: 'images/items/item5.png' },
+  { width: 50 / 1.5, height: 50 / 1.5, id: 6, image: 'images/items/item6.png' },
+  { width: 50 / 1.5, height: 50 / 1.5, id: 7, image: 'images/items/item7.png' },
 ];
 
 // 게임 요소들
@@ -112,16 +78,10 @@ function createSprites() {
     playerHeightInGame,
     minJumpHeightInGame,
     maxJumpHeightInGame,
-    scaleRatio
+    scaleRatio,
   );
 
-  ground = new Ground(
-    ctx,
-    groundWidthInGame,
-    groundHeightInGame,
-    GROUND_SPEED,
-    scaleRatio
-  );
+  ground = new Ground(ctx, groundWidthInGame, groundHeightInGame, GROUND_SPEED, scaleRatio);
 
   const cactiImages = CACTI_CONFIG.map((cactus) => {
     const image = new Image();
@@ -133,12 +93,7 @@ function createSprites() {
     };
   });
 
-  cactiController = new CactiController(
-    ctx,
-    cactiImages,
-    scaleRatio,
-    GROUND_SPEED
-  );
+  cactiController = new CactiController(ctx, cactiImages, scaleRatio, GROUND_SPEED);
 
   const itemImages = ITEM_CONFIG.map((item) => {
     const image = new Image();
@@ -151,25 +106,14 @@ function createSprites() {
     };
   });
 
-  itemController = new ItemController(
-    ctx,
-    itemImages,
-    scaleRatio,
-    GROUND_SPEED
-  );
+  itemController = new ItemController(ctx, itemImages, scaleRatio, GROUND_SPEED);
 
   score = new Score(ctx, scaleRatio);
 }
 
 function getScaleRatio() {
-  const screenHeight = Math.min(
-    window.innerHeight,
-    document.documentElement.clientHeight
-  );
-  const screenWidth = Math.min(
-    window.innerHeight,
-    document.documentElement.clientWidth
-  );
+  const screenHeight = Math.min(window.innerHeight, document.documentElement.clientHeight);
+  const screenWidth = Math.min(window.innerHeight, document.documentElement.clientWidth);
 
   // window is wider than the game width
   if (screenWidth / screenHeight < GAME_WIDTH / GAME_HEIGHT) {
@@ -212,7 +156,7 @@ function showStartGameText() {
 }
 
 function updateGameSpeed(deltaTime) {
-  gameSpeed += deltaTime * GAME_SPEED_INCREMENT * 0.33;
+  gameSpeed += deltaTime * GAME_SPEED_INCREMENT;
 }
 
 function reset() {
@@ -224,7 +168,6 @@ function reset() {
   cactiController.reset();
   score.reset();
   gameSpeed = GAME_SPEED_START;
-  // 게임시작 핸들러ID 2, payload 에는 게임 시작 시간
   sendEvent(2, { timestamp: Date.now() });
 }
 
