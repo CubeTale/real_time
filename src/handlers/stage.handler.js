@@ -12,19 +12,12 @@ export const moveStageHandler = (userId, payload) => {
   currentStages.sort((a, b) => a.id - b.id);
   const currentStage = currentStages[currentStages.length - 1];
 
-  // payload 의 currentStage 와 비교
-  if (currentStage.id !== payload.currentStage) {
-    return { status: 'fail', message: 'Current stage mismatch' };
-  }
-
   // 점수 검증
   const serverTime = Date.now();
   const elapsedTime = (serverTime - currentStage.timestamp) / 1000; // 초 단위로 계산
 
-  // 1초당 1점, 100점이상 다음스테이지 이동, 오차범위 5
-  // 클라이언트와 서버 간의 통신 지연시간을 고려해서 오차범위 설정
-  // elapsedTime 은 stage * 200 이상 stage * 200 + 5 이하 일 경우만 통과
-  if (elapsedTime < 200 * stages || elapsedTime > 200 * stages + 5) {
+  // elapsedTime 은 5 이상일 경우만 통과
+  if (elapsedTime < 10 && currentStage.score <= 200) {
     return { status: 'fail', message: 'Invalid elapsed time' };
   }
 
