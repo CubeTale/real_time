@@ -26,17 +26,11 @@ class Score {
       return;
     }
 
-    console.log('Checking items for stage:', stageId);
-    console.log('Available unlocks:', gameAssetsData.itemUnlocks.data);
-
     gameAssetsData.itemUnlocks.data.forEach((unlock) => {
       if (unlock.stage_id <= stageId) {
         this.unlockedItems.add(unlock.item_id);
-        console.log(`아이템 해금 성공: ${unlock.item_id} (스테이지 ${unlock.stage_id})`);
       }
     });
-
-    console.log('현재 해금된 아이템 목록:', Array.from(this.unlockedItems));
   }
 
   update(deltaTime) {
@@ -69,12 +63,6 @@ class Score {
         this.nextStageScore = nextStage.score;
         this.stageChange = true;
         this.checkItemUnlocks(this.currentStage);
-
-        console.log('스테이지 변경:', {
-          현재스테이지: this.currentStage,
-          다음스테이지점수: this.nextStageScore,
-          현재점수: this.score,
-        });
       }
     }
   }
@@ -85,7 +73,6 @@ class Score {
       return false;
     }
     const isUnlocked = this.unlockedItems.has(itemId);
-    console.log(`아이템 ${itemId} 해금 상태:`, isUnlocked);
     return isUnlocked;
   }
 

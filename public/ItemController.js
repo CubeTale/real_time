@@ -2,8 +2,8 @@ import Item from './Item.js';
 import { gameAssetsData, isSocketReady } from './Socket.js';
 
 class ItemController {
-  INTERVAL_MIN = 0;
-  INTERVAL_MAX = 4000;
+  INTERVAL_MIN = 1200;
+  INTERVAL_MAX = 3000;
 
   nextInterval = null;
   items = [];
@@ -15,12 +15,6 @@ class ItemController {
     this.scaleRatio = scaleRatio;
     this.speed = speed;
     this.score = score;
-
-    console.log('Score instance in constructor:', this.score);
-
-    if (!score) {
-      console.error('Score instance not provided to ItemController');
-    }
 
     this.setNextItemTime();
   }
@@ -45,13 +39,9 @@ class ItemController {
     }
 
     try {
-      console.log('Available items:', this.itemImages);
       const unlockedItemImages = this.itemImages.filter((item) => {
-        console.log(`Checking item ${item.id}`);
         return this.score.isItemUnlocked(item.id);
       });
-
-      console.log('Unlocked items:', unlockedItemImages);
 
       if (unlockedItemImages.length === 0) {
         console.log('No unlocked items available yet');
@@ -74,15 +64,11 @@ class ItemController {
       );
 
       this.items.push(item);
-      console.log(`아이템 생성 성공: ID ${itemInfo.id}, 위치 (${x}, ${y})`);
-    } catch (error) {
-      console.error('아이템 생성 중 오류:', error);
-    }
+    } catch (error) {}
   }
 
   update(gameSpeed, deltaTime) {
     if (this.nextInterval <= 0) {
-      console.log('Attempting to create new item...');
       this.createItem();
       this.setNextItemTime();
     }
@@ -97,7 +83,6 @@ class ItemController {
     const initialLength = this.items.length;
     this.items = this.items.filter((item) => item.x > -item.width);
     if (initialLength !== this.items.length) {
-      console.log('아이템 제거됨:', initialLength - this.items.length);
     }
   }
 
