@@ -1,18 +1,20 @@
 import Item from './Item.js';
+import { gameAssetsData, isSocketReady } from './Socket.js';
 
 class ItemController {
-  INTERVAL_MIN = 0;
-  INTERVAL_MAX = 4000;
+  INTERVAL_MIN = 1200;
+  INTERVAL_MAX = 3000;
 
   nextInterval = null;
   items = [];
 
-  constructor(ctx, itemImages, scaleRatio, speed) {
+  constructor(ctx, itemImages, scaleRatio, speed, score) {
     this.ctx = ctx;
     this.canvas = ctx.canvas;
     this.itemImages = itemImages;
     this.scaleRatio = scaleRatio;
     this.speed = speed;
+    this.score = score;
 
     this.setNextItemTime();
   }
@@ -26,22 +28,43 @@ class ItemController {
   }
 
   createItem() {
-    const index = this.getRandomNumber(0, this.itemImages.length - 1);
-    const itemInfo = this.itemImages[index];
-    const x = this.canvas.width * 1.5;
-    const y = this.getRandomNumber(10, this.canvas.height - itemInfo.height);
+    if (!isSocketReady || !gameAssetsData) {
+      console.log('Waiting for socket connection and game assets...');
+      return;
+    }
 
-    const item = new Item(
-      this.ctx,
-      itemInfo.id,
-      x,
-      y,
-      itemInfo.width,
-      itemInfo.height,
-      itemInfo.image,
-    );
+    if (!this.score || typeof this.score.isItemUnlocked !== 'function') {
+      console.error('Invalid Score instance');
+      return;
+    }
 
-    this.items.push(item);
+    try {
+      const unlockedItemImages = this.itemImages.filter((item) => {
+        return this.score.isItemUnlocked(item.id);
+      });
+
+      if (unlockedItemImages.length === 0) {
+        console.log('No unlocked items available yet');
+        return;
+      }
+
+      const index = this.getRandomNumber(0, unlockedItemImages.length - 1);
+      const itemInfo = unlockedItemImages[index];
+      const x = this.canvas.width * 1.5;
+      const y = this.getRandomNumber(10, this.canvas.height - itemInfo.height);
+
+      const item = new Item(
+        this.ctx,
+        itemInfo.id,
+        x,
+        y,
+        itemInfo.width,
+        itemInfo.height,
+        itemInfo.image,
+      );
+
+      this.items.push(item);
+    } catch (error) {}
   }
 
   update(gameSpeed, deltaTime) {
@@ -56,7 +79,11 @@ class ItemController {
       item.update(this.speed, gameSpeed, deltaTime, this.scaleRatio);
     });
 
+    // 화면 밖으로 나간 아이템 제거
+    const initialLength = this.items.length;
     this.items = this.items.filter((item) => item.x > -item.width);
+    if (initialLength !== this.items.length) {
+    }
   }
 
   draw() {
@@ -75,6 +102,8 @@ class ItemController {
 
   reset() {
     this.items = [];
+    this.nextInterval = null;
+    this.setNextItemTime();
   }
 }
 
